@@ -1,1 +1,1 @@
-# Lizzard Clicker!
+# The Waynes App!
