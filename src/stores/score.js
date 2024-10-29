@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia'
 import { getCurrentScope } from 'vue'
+import debounce from 'lodash.debounce'
+import { updateScore } from '@/api/app'
 
+const debouncedUpdateScore = debounce(updateScore, 500)
+
+// const debounced = debounce((score) => {
+// 	console.log('score', score)
+// }, 500)
 
 const baseLevelScore = 25
 
