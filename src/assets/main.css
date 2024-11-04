@@ -208,3 +208,71 @@ body {
   justify-content: center;
   margin-bottom: 1rem;
 }
+
+/* Animation Game Conteiner */
+.falling-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.falling {
+  position: absolute;
+  top: -100px;
+  left: var(--startX, 50%);
+  animation: fall linear forwards; /* меняем infinite на forwards */
+}
+
+.pumpkin {
+  width: 50px;
+}
+
+.waynes {
+  width: 70px;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+
+/*energyBar*/
+.energy-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 150px;
+  height: 20px;
+  background: #4b402e;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  color: #fff;
+}
+
+.energy-bar {
+  height: 100%;
+  background: #32cd32;
+  transition: width 0.2s ease;
+}
+
+.energy-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: #fff;
+}
+
+.disabled {
+  opacity: 0.5; /* Делаем изображение полупрозрачным */
+  pointer-events: none; /* Отключаем события мыши */
+}

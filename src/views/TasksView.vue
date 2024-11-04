@@ -28,6 +28,8 @@ onMounted(() => {
 })
 
 function openTask(task) {
+  if (app.user?.tasks?.[task.id]) return
+
   app.completeTask(task)
   if (task.url.includes('t.me')) {
     tg.openTelegramLink(task.url)

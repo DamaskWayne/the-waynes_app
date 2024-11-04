@@ -23,6 +23,7 @@ export async function getOrCreateUser() {
         friends: {},
         tasks: {},
         score: 0,
+        energy: 100,
     }
 
     await supabase.from('users').insert(newUser)
@@ -31,6 +32,22 @@ export async function getOrCreateUser() {
 
 export async function updateScore(score) {
     await supabase.from('users').update({ score }).eq('telegram', MY_ID)
+}
+
+export async function updateEnergy(energy) {
+	await supabase
+		.from('users')
+		.update({ energy, lastUpdated: new Date().toISOString() })
+		.eq('telegram', MY_ID)
+}
+
+export async function fetchEnergy() {
+	const { data } = await supabase
+		.from('users')
+		.select('energy, lastUpdated')
+		.eq('telegram', MY_ID)
+		.single()
+	return { energy: data?.energy, lastUpdated: data?.lastUpdated }
 }
 
 export async function registerRef(userName, refId) {

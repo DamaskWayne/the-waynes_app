@@ -23,7 +23,12 @@ export const useAppStore = defineStore('app', {
             }
         },
         async completeTask(task) {
+            if (this.user?.tasks?.[task.id]) return
             await completeTask(this.user, task)
+            this.user.tasks = {
+							...this.user.tasks,
+							[task.id]: true,
+						}
         },
         async fetchTasks() {
             this.tasks = await fetchTasks()
