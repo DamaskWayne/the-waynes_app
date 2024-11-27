@@ -1,7 +1,7 @@
 <template>
   <div class="energy-container" @click="decreaseEnergy">
     <div class="energy-bar" :style="{ width: energy + '%' }"></div>
-    <span class="energy-text">{{ energy }} / 100</span>
+    <span class="energy-text">{{ energy }}</span>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import { updateEnergy, fetchEnergy } from '@/api/app'
 
 const energy = ref(maxEnergy);
 const maxEnergy = 100;
-const energyRecoveryInterval = 3000;
+const energyRecoveryInterval = 60000;
 const recoveryRate = 1;
 
 // Функция для уменьшения энергии
