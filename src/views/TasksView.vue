@@ -1,7 +1,7 @@
 <template>
   <div class="text-content">
-    <h1>Your tasks</h1>
-    <h3 v-if="app.tasks.length === 0">Loading tasks...</h3>
+    <h1>Доступные задания</h1>
+    <h3 v-if="app.tasks.length === 0">Загрузка...</h3>
     <ul class="list">
       <li class="list-item" v-for="task in app.tasks" :key="task.id">
         {{ task.title }}

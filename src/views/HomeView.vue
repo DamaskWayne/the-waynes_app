@@ -1,80 +1,149 @@
 <template>
   <div class="game-container">
-    <EnergyProgress ref="energyRef" />
     <ScoreProgress />
     <div class="header">
-      <img src="../assets/pumpkin.png" alt="coin" />
-      <h2 class="score" id="score">{{ store.score }}</h2>
+      <div class="score-container">
+        <h2 class="score">{{ store.score }} WCoin</h2>
+        <i class="fa fa-plus plus-icon" @click="showModal = true"></i>
+      </div>
+      <button class="bubbly-button" :disabled="!isBonusAvailable" @click="getBonus">{{ buttonText }}</button>
     </div>
     <div class="circle">
-      <img
-        @click="increment"
-        ref="img"
-        id="circle"
-        :src="imgSrc"
-        :class="{ 'disabled': energyRef?.energy <= 0 }" 
-      />
+      <img ref="img" id="circle" :src="imgSrc" />
+    </div>
+    <div v-if="showModal" id="openModal" class="modal" @click.self="closeModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title">Информация</h3>
+            <a href="#close" class="close" @click="closeModal">×</a>
+          </div>
+          <div class="modal-body">
+            <p>
+              Сейчас купить WCoin не получится через Telegram Stars, но скоро будет возможность.
+              Если желаете приобрести WCoin, напишите в тг @dmitry_damask.
+              Также есть бонусная система покупок. Узнавайте подробнее у разработчика.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import EnergyProgress from '@/components/EnergyProgress.vue'
-import ScoreProgress from '@/components/ScoreProgress.vue'
-import { useScoreStore } from '@/stores/score'
-import frog from '@/assets/WAYNES.png'
-import lizard from '@/assets/WAYNES.png'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import ScoreProgress from '@/components/ScoreProgress.vue';
+import { useScoreStore } from '@/stores/score';
+import frog from '@/assets/WAYNES.png';
+import lizard from '@/assets/WAYNES.png';
+import supabase from '@/services/supabase';
+import { useTelegram } from '@/services/telegram';
 
-const img = ref(null)
-const energyRef = ref(null) // Создаем ссылку на EnergyProgress
-const imgSrc = computed(() => (store.score > 25 ? lizard : frog))
+const { user } = useTelegram(); // Получаем пользователя
+const MY_ID = user?.id ?? 4252;
+const store = useScoreStore();
 
-const store = useScoreStore()
+const imgSrc = computed(() => (store.score > 25 ? lizard : frog));
+const buttonText = ref('Получить бонус');
+const isBonusAvailable = ref(true);
+const timer = ref(null);
 
-onMounted(async () => {
-  await store.initializeScore() // Инициализация счета
-})
+// Проверка времени бонуса из Supabase
+const checkBonusAvailability = async () => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('last_bonus')
+    .eq('telegram', MY_ID)
+    .single();
 
-function increment(event) {
-  const energyComponent = energyRef.value // Получаем ссылку на компонент EnergyProgress
-  if (energyComponent.energy <= 0) return; // Остановить выполнение, если энергии 0
+  if (error || !data.last_bonus) {
+    isBonusAvailable.value = true;
+    return;
+  }
 
-  store.add(1)
-  energyComponent.decreaseEnergy(); // уменьшить энергию при каждом клике
-  const rect = event.target.getBoundingClientRect()
+  const lastBonusTime = new Date(data.last_bonus).getTime();
+  const currentTime = Date.now();
+  const timePassed = Math.floor((currentTime - lastBonusTime) / 1000); // В секундах
 
-  const offfsetX = event.clientX - rect.left - rect.width / 2
-  const offfsetY = event.clientY - rect.top - rect.height / 2
+  if (timePassed < 3600) {
+    isBonusAvailable.value = false;
+    startTimer(3600 - timePassed);
+  } else {
+    isBonusAvailable.value = true;
+  }
+};
 
-  const DEG = 40
+// Получение бонуса
+const getBonus = async () => {
+  if (!isBonusAvailable.value) return;
 
-  const tiltX = (offfsetY / rect.height) * DEG
-  const tiltY = (offfsetX / rect.width) * -DEG
+  store.add(35);
+  buttonText.value = 'Таймер: 1:00:00';
+  isBonusAvailable.value = false;
 
-  img.value.style.setProperty('--tiltX', `${tiltX}deg`)
-  img.value.style.setProperty('--tiltY', `${tiltY}deg`)
+  // Обновление времени в Supabase
+  await supabase
+    .from('users')
+    .update({ last_bonus: new Date().toISOString() })
+    .eq('telegram', MY_ID);
 
-  setTimeout(() => {
-    img.value.style.setProperty('--tiltX', `0deg`)
-    img.value.style.setProperty('--tiltY', `0deg`)
-  }, 300)
+  startTimer(3600); // Запуск таймера
+};
 
-  const plusOne = document.createElement('div')
-  plusOne.classList.add('plus-one')
-  plusOne.textContent = '+1'
-  plusOne.style.left = `${event.clientX - rect.left}px`
-  plusOne.style.top = `${event.clientY - rect.top}px`
+// Запуск таймера
+const startTimer = (seconds) => {
+  let remainingTime = Math.floor(seconds);
 
-  img.value.parentElement.appendChild(plusOne)
+  timer.value = setInterval(() => {
+    remainingTime--;
 
-  setTimeout(() => plusOne.remove(), 2000)
-}
+    const hours = Math.floor(remainingTime / 3600);
+    const minutes = Math.floor((remainingTime % 3600) / 60);
+    const seconds = remainingTime % 60;
+
+    buttonText.value = `Бонус через: ${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    if (remainingTime <= 0) {
+      clearInterval(timer.value);
+      buttonText.value = 'Получить бонус';
+      isBonusAvailable.value = true;
+    }
+  }, 1000);
+};
+
+// Инициализация компонента
+onMounted(() => {
+  checkBonusAvailability();
+
+  // Проверяем, была ли анимация уже выполнена
+  if (!localStorage.getItem('page_visited')) {
+    // Если не была, запускаем анимацию
+    setTimeout(() => {
+      document.body.classList.add('body_visible');
+    }, 700); // Задержка для плавного появления
+
+    // Устанавливаем флаг в localStorage
+    localStorage.setItem('page_visited', 'true');
+  } else {
+    // Если была, сразу показываем содержимое
+    document.body.classList.add('body_visible');
+  }
+});
+
+// Очистка таймера
+onBeforeUnmount(() => {
+  if (timer.value) clearInterval(timer.value);
+});
+
+// Модальное окно
+const showModal = ref(false);
+
+const closeModal = () => {
+  showModal.value = false;
+};
 </script>
 
 <style scoped>
-.disabled {
-  opacity: 0.5; /* Делаем изображение полупрозрачным */
-  pointer-events: none; /* Отключаем события мыши */
-}
+/* Ваши стили */
 </style>
