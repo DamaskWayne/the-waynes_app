@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineExpose } from 'vue';
+import { ref, onMounted } from 'vue';
 import { updateEnergy, fetchEnergy } from '@/api/app'
 
 const energy = ref(maxEnergy);

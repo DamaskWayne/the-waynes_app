@@ -12,22 +12,37 @@ export async function fetchTasks() {
 }
 
 export async function getOrCreateUser() {
-    const pontentialUser = await supabase.from('users').select().eq('telegram', MY_ID)
+	// Получаем информацию о пользователе по его telegram ID
+	const { data: existingUser } = await supabase
+		.from('users')
+		.select()
+		.eq('telegram', MY_ID)
+		.single()
 
-    if (pontentialUser.data.length !== 0) {
-        return pontentialUser.data[0]
-    }
+	if (existingUser) {
+		// Если пользователь существует, обновляем его никнейм, если он изменился
+		if (existingUser.nickname !== user?.username) {
+			await supabase
+				.from('users')
+				.update({ nickname: user?.username })
+				.eq('telegram', MY_ID)
+		}
+		return existingUser
+	}
 
-    const newUser = {
-        telegram: MY_ID,
-        friends: {},
-        tasks: {},
-        score: 0,
-        energy: 100,
-    }
+	// Если пользователя нет в базе, создаем нового
+	const newUser = {
+		telegram: MY_ID,
+		nickname: user?.username || 'Без ника', // Если нет ника, записываем 'Без ника'
+		friends: {},
+		tasks: {},
+		score: 0,
+		energy: 100,
+	}
 
-    await supabase.from('users').insert(newUser)
-    return newUser
+	// Вставляем нового пользователя в базу данных
+	await supabase.from('users').insert(newUser)
+	return newUser
 }
 
 export async function updateScore(score) {
@@ -51,14 +66,22 @@ export async function fetchEnergy() {
 }
 
 export async function registerRef(userName, refId) {
-    const { data } = await supabase.from('users').select().eq('telegram', +refId)
+	const { data } = await supabase.from('users').select().eq('telegram', +refId)
 
-    const refUser = data[0]
+	const refUser = data[0]
 
-    await supabase.from('users').update({
-        friends: { ...refUser.friends, [MY_ID]: userName },
-        score: refUser.score + 500,
-    }).eq('telegram', +refId)
+	// Проверка, был ли уже приглашён этот пользователь (по его ID в friends)
+	if (refUser.friends && refUser.friends[MY_ID]) {
+		return // Если уже есть, ничего не делаем
+	}
+
+	await supabase
+		.from('users')
+		.update({
+			friends: { ...refUser.friends, [MY_ID]: userName },
+			score: refUser.score + 500,
+		})
+		.eq('telegram', +refId)
 }
 
 export async function completeTask(user, task) {

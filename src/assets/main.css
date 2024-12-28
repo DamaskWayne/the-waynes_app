@@ -25,26 +25,27 @@ body {
 
 .header {
   position: absolute;
-  top: 20px;
+  top: -11px;
   right: 20px;
   display: flex;
   align-items: center;
+  z-index: 10;
 }
 
 .score-container {
   display: flex;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.3);
-  padding: 5px 10px;
-  border-radius: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
 }
 
 .score {
   color: #32cd32; /* Зеленый цвет */
-  font-size: 24px;
+  font-size: 15px;
   font-weight: bold;
-  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7); /* Тень */
-  margin-right: 10px;
+  text-shadow: 2px 2px 6px rgba(26, 255, 0, 0.213); /* Тень */
+  margin-right: -5px;
 }
 
 .plus-icon {
@@ -90,7 +91,7 @@ body {
 }
 /* === NEW === */
 .menu {
-  background: #a5e7ff;
+  background: linear-gradient(135deg, #a5e7ff, #7fdbff);
   display: flex;
   align-items: center;
   position: absolute;
@@ -101,18 +102,26 @@ body {
   height: 60px;
   border-radius: 20px;
   font-size: 1.5rem;
+  box-shadow: 0 4px 10px rgba(15, 170, 191, 0.667);
 }
 
 .menu-button {
-  color: #4e4d52;
+  color: #0e484d;
   cursor: pointer;
   transition: color 0.3s;
 }
 
 .menu-button:hover,
 .menu-button.active {
-  color: #fff;
-  cursor: pointer;
+  color: transparent; /* Убираем обычный цвет текста */
+  background: linear-gradient(45deg, #3c0642, #dd02ff); /* Градиентный фон для текста */
+  background-clip: text; /* Применяем градиент к тексту */
+  -webkit-background-clip: text; /* Поддержка для Safari */
+  cursor: pointer; /* Курсор как указатель */
+  transform: scale(1.2); /* Легкий эффект увеличения */
+  
+  /* Градиентная тень */
+  text-shadow: rgba(60, 6, 66, 0.6), 0 0 25px rgba(221, 2, 255, 0.5), 0 0 5px rgba(221, 2, 255, 0.4);
 }
 /* === /NEW === */
 
@@ -188,13 +197,14 @@ body {
 }
 
 .list-item {
-  background: #2a292e;
+  background: #271c54;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   margin-bottom: 1rem;
+  overflow-y: auto;
 }
 
 .list-btn {
@@ -272,54 +282,6 @@ body {
   box-sizing: border-box;
 }
 
-body {
-  /*background: #0f0a18;*/
-  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.box {
-  flex-direction: column;
-  max-width: 450px;
-  max-height: 650px;
-  width: 450px;
-  height: 650px;
-  background: #221a30;
-}
-
-.box h1 {
-  color: #fff;
-  text-align: center;
-  margin-top: 20px;
-}
-
-.box img {
-  width: 256px;
-  height: 256px;
-  margin: 18% auto;
-  display: block;
-}
-
-.box button {
-  outline: none;
-  border: none;
-  padding: 18px;
-  border-radius: 60px;
-  display: block;
-  margin: -60px auto;
-  width: 275px;
-  font-size: 1.5em;
-  box-shadow: 0 10px 0 #15fc89;
-  transition: all 0.3s;
-}
-
-.box button:hover{
-  box-shadow: 10px 10px 10px #0f0a18;
-  transform: translateY(3px);
-}
-
 /* Bubbly Button */
 
 .bubbly-button {
@@ -334,8 +296,8 @@ body {
   border: none;
   cursor: pointer;
   position: absolute; /* Меняем на absolute для точного позиционирования */
-  top: -5px; /* Задаем отступ сверху */
-  left: -564px; /* Задаем отступ слева */
+  top: -10%; /* Задаем отступ сверху */
+  left: -316%; /* Задаем отступ слева */
   transition: transform ease-in 0.1s, box-shadow ease-in 0.25s;
   box-shadow: 0 2px 25px rgba(255, 0, 130, 0.5);
 
@@ -389,6 +351,54 @@ body {
 .bubbly-button[disabled] {
   background-color: gray;
   cursor: not-allowed;
+}
+
+body {
+  /*background: #0f0a18;*/
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box {
+  flex-direction: column;
+  max-width: 450px;
+  max-height: 650px;
+  width: 450px;
+  height: 650px;
+  background: #221a30;
+}
+
+.box h1 {
+  color: #fff;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.box img {
+  width: 256px;
+  height: 256px;
+  margin: 18% auto;
+  display: block;
+}
+
+.box button {
+  outline: none;
+  border: none;
+  padding: 18px;
+  border-radius: 60px;
+  display: block;
+  margin: -60px auto;
+  width: 275px;
+  font-size: 1.5em;
+  box-shadow: 0 10px 0 #15fc89;
+  transition: all 0.3s;
+}
+
+.box button:hover{
+  box-shadow: 10px 10px 10px #0f0a18;
+  transform: translateY(3px);
 }
 
 /* Модальное окно */

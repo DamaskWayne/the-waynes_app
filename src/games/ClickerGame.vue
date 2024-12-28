@@ -2,7 +2,7 @@
   <div class="clicker-container">
     <EnergyProgress ref="energyRef" />
     <div class="header">
-      <h2 class="score">Кликай по изображению</h2>
+      <h2 class="score">{{ headerText }}</h2>
     </div>
     <div class="circle">
       <img
@@ -10,7 +10,7 @@
         ref="img"
         id="circle"
         src="@/assets/WAYNES.png"
-        :class="{ 'disabled': energyRef?.energy <= 0 }"
+        :class="{ 'disabled': isLoading || energyRef?.energy <= 0 }"
       />
     </div>
   </div>
@@ -24,11 +24,17 @@ import { useToast } from 'vue-toastification';
 
 const img = ref(null);
 const energyRef = ref(null);
+const isLoading = ref(true); // Изначально заблокировано
+const headerText = ref('Временно не доступно...');
 const toast = useToast();
 const store = useScoreStore();
 
-onMounted(async () => {
-  await store.initializeScore();
+// Снимаем блокировку через 2 секунды после загрузки
+onMounted(() => {
+  setTimeout(() => {
+    isLoading.value = false; // Разрешаем клики
+    headerText.value = 'Кликай по «WAYNES»';
+  }, 2000000000);
 });
 
 // Основная логика обработки клика
@@ -42,7 +48,6 @@ function handleIncrement(event) {
   store.add(1);
   energyComponent.decreaseEnergy();
 
-  // Визуальный эффект движения изображения
   const rect = event.target.getBoundingClientRect();
   const offsetX = event.clientX - rect.left - rect.width / 2;
   const offsetY = event.clientY - rect.top - rect.height / 2;
@@ -56,7 +61,6 @@ function handleIncrement(event) {
     img.value.style.setProperty('--tiltY', `0deg`);
   }, 300);
 
-  // Эффект "+1" на экране
   const plusOne = document.createElement('div');
   plusOne.classList.add('plus-one');
   plusOne.textContent = '+1';
@@ -68,3 +72,9 @@ function handleIncrement(event) {
 }
 </script>
 
+<style scoped>
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+</style>

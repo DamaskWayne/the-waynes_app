@@ -8,12 +8,14 @@
 
     <h3 v-if="friends.length === 0">Вы еще не пригласили никого</h3>
 
-    <ul class="list">
-      <li class="list-item" v-for="friend in friends" :key="friend.id">
-        {{ friend.name }}
-        <span class="list-btn done">500</span>
-      </li>
-    </ul>
+    <div class="friends-list-container">
+      <ul class="list">
+        <li class="list-item" v-for="friend in friends" :key="friend.id">
+          {{ friend.name }}
+          <span class="list-btn done">500</span>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -37,3 +39,11 @@ function copy() {
   referalText.value = 'Ваша ссылка готова!'
 }
 </script>
+
+<style scoped>
+.friends-list-container {
+  max-height: 70vh; /* Максимальная высота, можно настроить */
+  overflow-y: auto;
+  padding: 10px;
+}
+</style>
